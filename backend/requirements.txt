@@ -6,3 +6,5 @@ sentence-transformers
 numpy
 scikit-learn
 python-dotenv
+chromadb
+google-genai
