@@ -2,10 +2,14 @@ import os
 import chromadb
 from pathlib import Path
 
+_shared_client = None
+_shared_collection = None
+
 
 class VectorStore:
 
     def __init__(self):
+        global _shared_client, _shared_collection
 
         # Persistent database directory
         db_path = Path(
@@ -13,18 +17,22 @@ class VectorStore:
         )
         db_path.mkdir(parents=True, exist_ok=True)
 
-        # Create persistent ChromaDB client
-        self.client = chromadb.PersistentClient(
-            path=str(db_path)
-        )
+        if _shared_client is None:
+            # Create persistent ChromaDB client
+            _shared_client = chromadb.PersistentClient(
+                path=str(db_path)
+            )
 
-        # Create or retrieve collection
-        self.collection = self.client.get_or_create_collection(
-            name="enterprise_documents",
-            metadata={"hnsw:space": "cosine"}
-        )
+            # Create or retrieve collection
+            _shared_collection = _shared_client.get_or_create_collection(
+                name="enterprise_documents",
+                metadata={"hnsw:space": "cosine"}
+            )
 
-        print("ChromaDB initialized successfully!")
+            print("ChromaDB initialized successfully!")
+
+        self.client = _shared_client
+        self.collection = _shared_collection
 
     def add_chunks(self, chunks, embeddings):
 

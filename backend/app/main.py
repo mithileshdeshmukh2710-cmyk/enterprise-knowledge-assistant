@@ -75,8 +75,6 @@ def get_document_service():
     return document_service
 
 
-from pydantic import BaseModel, Field
-
 class QuestionRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
 

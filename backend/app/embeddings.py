@@ -1,27 +1,32 @@
-
+import torch
 from sentence_transformers import SentenceTransformer
+
+# Limit PyTorch threads to reduce container memory footprint on Render free tier (512MB RAM)
+torch.set_num_threads(1)
+
+_shared_model = None
 
 
 class EmbeddingGenerator:
 
     def __init__(self):
-        print("Loading embedding model...")
+        global _shared_model
+        if _shared_model is None:
+            print("Loading embedding model...")
+            _shared_model = SentenceTransformer(
+                "all-MiniLM-L6-v2",
+                device="cpu"
+            )
+            print("Embedding model loaded!")
 
-        self.model = SentenceTransformer(
-            "all-MiniLM-L6-v2"
-        )
-
-        print("Embedding model loaded!")
+        self.model = _shared_model
 
     def generate_embeddings(self, texts):
-
-        embeddings = self.model.encode(
+        return self.model.encode(
             texts,
             normalize_embeddings=True,
-            show_progress_bar=True
+            show_progress_bar=False
         )
-
-        return embeddings
 
 
 # Testing the embedding generator
