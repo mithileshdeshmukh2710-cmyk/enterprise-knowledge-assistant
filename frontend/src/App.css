@@ -1,0 +1,303 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, Arial, sans-serif;
+  background: #f5f7fb;
+  color: #172033;
+}
+
+button,
+textarea {
+  font: inherit;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.header {
+  height: 70px;
+  padding: 0 8%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-bottom: 1px solid #e7eaf0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 21px;
+  font-weight: 750;
+}
+
+.brand-icon {
+  color: #635bdb;
+  font-size: 28px;
+}
+
+.header-label {
+  color: #737d91;
+  font-size: 13px;
+}
+
+.container {
+  width: min(760px, 92%);
+  margin: 55px auto;
+}
+
+.hero {
+  margin-bottom: 35px;
+}
+
+.eyebrow {
+  color: #635bdb;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 1.7px;
+}
+
+.hero h1 {
+  margin: 12px 0;
+  font-size: clamp(34px, 6vw, 48px);
+  letter-spacing: -1.5px;
+}
+
+.subtitle {
+  color: #737d91;
+  line-height: 1.7;
+}
+
+.panel {
+  padding: 28px;
+  margin-bottom: 22px;
+  background: white;
+  border: 1px solid #e7eaf0;
+  border-radius: 16px;
+  box-shadow: 0 5px 20px rgba(30, 41, 59, 0.035);
+}
+
+.section-heading {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 23px;
+}
+
+.step {
+  color: #635bdb;
+  font-weight: 750;
+  font-size: 14px;
+}
+
+.section-heading h2 {
+  margin: 0 0 6px;
+  font-size: 19px;
+}
+
+.section-heading p {
+  margin: 0;
+  color: #7b8496;
+  font-size: 13px;
+}
+
+.upload-area {
+  padding: 30px 15px;
+  text-align: center;
+  border: 1.5px dashed #c8cce0;
+  border-radius: 12px;
+  background: #fafaff;
+}
+
+.upload-icon {
+  font-size: 30px;
+  color: #635bdb;
+}
+
+.file-label {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 10px 17px;
+  color: #5148c8;
+  background: #eeedff;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.file-label input {
+  display: none;
+}
+
+.upload-area p {
+  color: #9098a8;
+  font-size: 12px;
+}
+
+.primary-button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 13px;
+  color: white;
+  background: #635bdb;
+  border: none;
+  border-radius: 9px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.primary-button:hover:not(:disabled) {
+  background: #5148c8;
+}
+
+.primary-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+textarea {
+  width: 100%;
+  padding: 15px;
+  resize: vertical;
+  border: 1px solid #dfe3ec;
+  border-radius: 10px;
+  outline: none;
+  line-height: 1.6;
+}
+
+textarea:focus {
+  border-color: #635bdb;
+  box-shadow: 0 0 0 3px #635bdb18;
+}
+
+.answer {
+  margin-top: 25px;
+  padding: 20px;
+  background: #f8f8ff;
+  border: 1px solid #e5e3ff;
+  border-radius: 11px;
+}
+
+.answer h3 {
+  margin: 0 0 12px;
+  font-size: 15px;
+}
+
+.answer-text {
+  line-height: 1.8;
+  color: #394257;
+  white-space: pre-wrap;
+}
+
+.sources {
+  padding: 0;
+  list-style: none;
+}
+
+.sources li {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+  font-size: 13px;
+  border-top: 1px solid #e7e8f1;
+}
+
+.no-sources {
+  color: #7b8496;
+  font-size: 13px;
+}
+
+.success-message,
+.error-message {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.success-message {
+  color: #167343;
+  background: #eaf8f0;
+}
+
+.error-message {
+  color: #b42318;
+  background: #fff0ef;
+}
+
+footer {
+  padding: 25px;
+  text-align: center;
+  color: #9299a8;
+  font-size: 12px;
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 0 5%;
+  }
+
+  .header-label {
+    display: none;
+  }
+
+  .container {
+    margin: 35px auto;
+  }
+
+  .panel {
+    padding: 20px;
+  }
+}
+
+
+.secondary-button {
+  padding: 9px 14px;
+  background: #eeedff;
+  color: #5148c8;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.document-list {
+  padding: 0;
+  list-style: none;
+}
+
+.document-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 15px 0;
+  border-bottom: 1px solid #e7eaf0;
+}
+
+.document-list strong {
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.document-list p {
+  margin: 6px 0 0;
+  color: #7b8496;
+  font-size: 12px;
+}
+
+.delete-button {
+  padding: 7px 11px;
+  background: #fff0ef;
+  color: #b42318;
+  border: none;
+  border-radius: 7px;
+  cursor: pointer;
+}

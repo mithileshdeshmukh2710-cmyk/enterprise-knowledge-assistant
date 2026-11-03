@@ -8,3 +8,6 @@ scikit-learn
 python-dotenv
 chromadb
 google-genai
+slowapi
+pytest
+httpx

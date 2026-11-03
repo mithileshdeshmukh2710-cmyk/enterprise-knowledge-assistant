@@ -1,4 +1,4 @@
-
+import os
 import chromadb
 from pathlib import Path
 
@@ -8,7 +8,9 @@ class VectorStore:
     def __init__(self):
 
         # Persistent database directory
-        db_path = Path("data/chroma_db")
+        db_path = Path(
+            os.getenv("CHROMA_DB_PATH", "data/chroma_db")
+        )
         db_path.mkdir(parents=True, exist_ok=True)
 
         # Create persistent ChromaDB client
@@ -90,3 +92,37 @@ class VectorStore:
     def count(self):
 
         return self.collection.count()
+
+    def delete_source(self, source: str):
+        self.collection.delete(
+            where={"source": source}
+        )
+
+    def list_sources(self):
+        result = self.collection.get(
+            include=["metadatas"]
+        )
+
+        documents = {}
+
+        for metadata in result["metadatas"] or []:
+            source = metadata["source"]
+
+            if source not in documents:
+                documents[source] = {
+                    "filename": source,
+                    "chunks": 0,
+                    "pages": set()
+                }
+
+            documents[source]["chunks"] += 1
+            documents[source]["pages"].add(metadata["page"])
+
+        return [
+            {
+                "filename": item["filename"],
+                "chunks": item["chunks"],
+                "pages": len(item["pages"])
+            }
+            for item in documents.values()
+        ]

@@ -1,11 +1,16 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 from google import genai
 
 
 # Load environment variables
-load_dotenv()
+backend_env = Path(__file__).resolve().parent.parent / ".env"
+if backend_env.exists():
+    load_dotenv(dotenv_path=backend_env)
+else:
+    load_dotenv()
 
 API_KEY = os.getenv("GEMINI_API_KEY")
 

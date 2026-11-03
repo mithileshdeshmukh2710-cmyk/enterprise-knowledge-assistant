@@ -1,6 +1,10 @@
 .env
+.env.*
+!.env.example
+backend/.env
 .venv/
 __pycache__/
 *.pyc
-data/
-chroma_db/
+data/chroma_db/
+node_modules/
+dist/

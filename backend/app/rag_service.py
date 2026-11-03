@@ -1,7 +1,7 @@
-from backend.app.embeddings import EmbeddingGenerator
-from backend.app.vector_store import VectorStore
-from backend.app.gemini_client import GeminiClient
-from backend.app.prompts import SYSTEM_PROMPT
+from app.embeddings import EmbeddingGenerator
+from app.vector_store import VectorStore
+from app.gemini_client import GeminiClient
+from app.prompts import SYSTEM_PROMPT
 
 
 class RAGService:
@@ -18,72 +18,105 @@ class RAGService:
 
         print("RAG service initialized!")
 
-    def ask_question(self, question: str, top_k: int = 3):
+    def ask_question(self, question, top_k=3, history=None):
+        history = history or []
 
-        # Step 1: Generate question embedding
-        query_embedding = (
-            self.embedding_generator
-            .generate_embeddings([question])[0]
+        previous_user_questions = [
+            message["content"]
+            for message in (history or [])[-6:]
+            if message.get("role") == "user"
+            and isinstance(message.get("content"), str)
+        ]
+        retrieval_query = " ".join(
+            previous_user_questions[-2:] + [question]
         )
+        query_embedding = self.embedding_generator.generate_embeddings(
+            [retrieval_query]
+        )[0]
 
-        # Step 2: Retrieve relevant chunks
         results = self.vector_store.search(
             query_embedding,
-            top_k=top_k
+            top_k
         )
 
         documents = results["documents"][0]
         metadatas = results["metadatas"][0]
+        distances = results["distances"][0]
 
-        if not documents:
+        # Keep only sufficiently relevant chunks.
+        MAX_DISTANCE = 0.55
+
+        relevant_chunks = []
+
+        for document, metadata, distance in zip(
+            documents, metadatas, distances
+        ):
+            if distance <= MAX_DISTANCE:
+                relevant_chunks.append({
+                    "text": document,
+                    "metadata": metadata,
+                    "distance": distance
+                })
+
+        if not relevant_chunks:
             return {
+                "question": question,
                 "answer": (
-                    "No documents have been indexed yet. "
-                    "Please upload a document first."
+                    "I could not find sufficiently relevant information "
+                    "in the uploaded documents to answer this question."
                 ),
                 "sources": []
             }
 
-        # Step 3: Build context
         context_parts = []
         sources = []
 
-        for document, metadata in zip(documents, metadatas):
+        for item in relevant_chunks:
 
-            source = metadata.get("source", "Unknown")
-            page = metadata.get("page", "Unknown")
+            metadata = item["metadata"]
 
             context_parts.append(
                 f"""
-                <document_chunk>
-                Source: {source}
-                Page: {page}
-                Content:
-                {document}
-                </document_chunk>
-                """
+            Source: {metadata['source']}
+            Page: {metadata['page']}
+            Content: {item['text']}
+            """
             )
 
-            source_info = {
-                "source": source,
-                "page": page
+            source = {
+                "source": metadata["source"],
+                "page": metadata["page"],
+                "distance": round(item["distance"], 4)
             }
 
-            if source_info not in sources:
-                sources.append(source_info)
+            if source not in sources:
+                sources.append(source)
 
         context = "\n".join(context_parts)
 
-        # Step 4: Build final prompt
+        history_text = ""
+        for message in history[-6:]:
+            role = message.get("role", "")
+            content = message.get("content", "")
+            if role in ["user", "assistant"] and isinstance(content, str):
+                history_text += f"{role.upper()}: {content[:2000]}\n"
+
         prompt = SYSTEM_PROMPT.format(
             context=context,
             question=question
         )
 
-        # Step 5: Generate answer using Gemini
+        prompt += f"""
+Recent conversation:
+{history_text}
+Use the recent conversation only to understand references
+and follow-up questions. Answer factual questions using
+the retrieved document context. If the documents do not
+support the answer, say that the information could not
+be found."""
+
         answer = self.gemini.generate_answer(prompt)
 
-        # Step 6: Return answer and sources
         return {
             "question": question,
             "answer": answer,

@@ -1,0 +1,5 @@
+question,correctness,faithfulness,relevance,abstention
+"How many days can employees work remotely?",Pass,Pass,Pass,N/A
+"Who approves annual leave?",Pass,Pass,Pass,N/A
+"What health insurance benefits are available?",Pass,Pass,Pass,N/A
+"What is the company's stock market valuation?",Pass,Pass,Pass,Pass
