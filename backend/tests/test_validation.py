@@ -1,7 +1,10 @@
 import pytest
 from pydantic import ValidationError
 
-from backend.app.main import QuestionRequest
+try:
+    from app.main import QuestionRequest
+except ImportError:
+    from backend.app.main import QuestionRequest
 
 
 def test_valid_question():

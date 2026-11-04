@@ -1,7 +1,13 @@
-from app.embeddings import EmbeddingGenerator
-from app.vector_store import VectorStore
-from app.gemini_client import GeminiClient
-from app.prompts import SYSTEM_PROMPT
+try:
+    from app.embeddings import EmbeddingGenerator
+    from app.vector_store import VectorStore
+    from app.gemini_client import GeminiClient
+    from app.prompts import SYSTEM_PROMPT
+except ImportError:
+    from backend.app.embeddings import EmbeddingGenerator
+    from backend.app.vector_store import VectorStore
+    from backend.app.gemini_client import GeminiClient
+    from backend.app.prompts import SYSTEM_PROMPT
 
 
 class RAGService:
@@ -34,27 +40,37 @@ class RAGService:
             [retrieval_query]
         )[0]
 
-        results = self.vector_store.search(
-            query_embedding,
-            top_k
+        results = self.vector_store.hybrid_search(
+            query=retrieval_query,
+            query_embedding=query_embedding,
+            top_k=top_k
         )
 
-        documents = results["documents"][0]
-        metadatas = results["metadatas"][0]
-        distances = results["distances"][0]
-
-        # Keep only sufficiently relevant chunks.
         MAX_DISTANCE = 0.55
+        MAX_BM25_RANK = 2
 
         relevant_chunks = []
 
-        for document, metadata, distance in zip(
-            documents, metadatas, distances
-        ):
-            if distance <= MAX_DISTANCE:
+        for item in results:
+            distance = item["vector_distance"]
+            bm25_rank = item["bm25_rank"]
+            bm25_score = item["bm25_score"]
+
+            semantic_match = (
+                distance is not None
+                and distance <= MAX_DISTANCE
+            )
+
+            keyword_match = (
+                bm25_rank is not None
+                and bm25_rank <= MAX_BM25_RANK
+                and bm25_score > 0
+            )
+
+            if semantic_match or keyword_match:
                 relevant_chunks.append({
-                    "text": document,
-                    "metadata": metadata,
+                    "text": item["text"],
+                    "metadata": item["metadata"],
                     "distance": distance
                 })
 
@@ -86,7 +102,7 @@ class RAGService:
             source = {
                 "source": metadata["source"],
                 "page": metadata["page"],
-                "distance": round(item["distance"], 4)
+                "distance": round(item["distance"], 4) if item["distance"] is not None else None
             }
 
             if source not in sources:

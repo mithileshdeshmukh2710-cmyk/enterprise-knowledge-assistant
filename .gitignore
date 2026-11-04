@@ -6,5 +6,7 @@ backend/.env
 __pycache__/
 *.pyc
 data/chroma_db/
+data/document_metadata.json
+data/document_metadata.tmp
 node_modules/
 dist/
